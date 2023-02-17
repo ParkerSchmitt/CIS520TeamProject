@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 
 # ALL OF THE SPECIFIED NAMES IN THIS CMAKE ARE REQUIRED.
-# Set the project name variable to hw2.
+# Set the project name variable to assignment3.
 # THIS IS REQUIRED
-project(hw2)
+project(assignment3)
 
 # Add your CMAKE_C_FLAGS AND CMAKE_CXX_FLAGS here
 # Make SURE to use -std=c11 and -std=c++11 where relevant.
@@ -14,33 +14,19 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -Wshadow -Werror")
 
 # Add our include directory to CMake's search paths.
 # THIS IS REQUIRED
-include_directories( include )
-
-message(STATUS "Binding 'source' directory")
-set( LEARN_CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-message(STATUS "Binding 'include' directory")
-set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/include/" )
-
 
 
 # Create library from dyn_array so we can use it later.
-add_library(dyn_array SHARED src/dyn_array.c)
-set_target_properties(dyn_array PROPERTIES
-    PUBLIC_HEADER include/dyn_array.h)
 
 
 # Compile the analysis executable.
 
-add_executable(analysis ${CMAKE_SOURCE_DIR}/src/analysis.c)
-
 
 # link the dyn_array library we compiled against our analysis executable.
-target_link_libraries(analysis dyn_array)
 
 
 # Compile the the tester executable.
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/test/")
-add_executable(${PROJECT_NAME}_test ${CMAKE_SOURCE_DIR}/test/tests.cpp)
+add_executable(${PROJECT_NAME}_test ......)
 
 target_compile_definitions(${PROJECT_NAME}_test PRIVATE)
 
