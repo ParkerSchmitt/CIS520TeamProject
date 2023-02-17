@@ -30,15 +30,17 @@ set_target_properties(dyn_array PROPERTIES
 
 
 # Compile the analysis executable.
-add_executable(analysis analysis.c)
-add_executable(analysis analysis.c dyn_array)
+
+add_executable(analysis ${CMAKE_SOURCE_DIR}/src/analysis.c)
 
 
 # link the dyn_array library we compiled against our analysis executable.
+target_link_libraries(analysis dyn_array)
 
 
 # Compile the the tester executable.
-add_executable(${PROJECT_NAME}_test ......)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/test/")
+add_executable(${PROJECT_NAME}_test ${CMAKE_SOURCE_DIR}/test/tests.cpp)
 
 target_compile_definitions(${PROJECT_NAME}_test PRIVATE)
 
