@@ -25,8 +25,6 @@ set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/include/" )
 
 # Create library from dyn_array so we can use it later.
 add_library(dyn_array SHARED src/dyn_array.c)
-set_target_properties(dyn_array PROPERTIES
-    PUBLIC_HEADER include/dyn_array.h)
 
 
 # Compile the analysis executable.
@@ -39,8 +37,12 @@ target_link_libraries(analysis dyn_array)
 
 
 # Compile the the tester executable.
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/test/")
-add_executable(${PROJECT_NAME}_test ${CMAKE_SOURCE_DIR}/test/tests.cpp)
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
+add_executable(${PROJECT_NAME}_test ${CMAKE_SOURCE_DIR}/test/tests.cpp ${CMAKE_SOURCE_DIR}/include/processing_scheduling.h ${CMAKE_SOURCE_DIR}/src/process_scheduling.c)
+
+
+target_link_libraries(analysis dyn_array)
 
 target_compile_definitions(${PROJECT_NAME}_test PRIVATE)
 
