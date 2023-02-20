@@ -101,7 +101,7 @@ TEST (first_come_first_serve, GoodParams) {
 
 //If both params are null
 TEST (shortest_job_first, NullParams) {
-    bool ret = first_come_first_serve(NULL, NULL);
+    bool ret = shortest_job_first(NULL, NULL);
     bool expected = false;
     EXPECT_EQ(ret,expected);
     if (ret == expected) {
@@ -111,7 +111,7 @@ TEST (shortest_job_first, NullParams) {
 //If queue param is null
 TEST (shortest_job_first, NullQueue) {
     ScheduleResult_t *result = new ScheduleResult_t;
-    bool ret = first_come_first_serve(NULL, result);
+    bool ret = shortest_job_first(NULL, result);
     bool expected = false;
     EXPECT_EQ(ret,expected);
     if (ret == expected) {
@@ -121,7 +121,7 @@ TEST (shortest_job_first, NullQueue) {
 //If result param is null
 TEST (shortest_job_first, NullResult) {
     dyn_array_t* array = dyn_array_create(0, sizeof(ProcessControlBlock_t), NULL);
-    bool ret = first_come_first_serve(array, NULL);
+    bool ret = shortest_job_first(array, NULL);
     dyn_array_destroy(array);
     bool expected = false;
 
@@ -163,6 +163,87 @@ TEST (shortest_job_first, GoodParams) {
         score = score + 10;
     }
 }
+
+//If queue param is null
+TEST (round_robin, NullQueue) {
+    ScheduleResult_t *result = new ScheduleResult_t;
+    bool ret = round_robin(NULL, result, 0);
+    bool expected = false;
+    EXPECT_EQ(ret,expected);
+    if (ret == expected) {
+        score = score + 10;
+    }
+}
+//If result param is null
+TEST (round_robin, NullResult) {
+    dyn_array_t* array = dyn_array_create(0, sizeof(ProcessControlBlock_t), NULL);
+    bool ret = round_robin(array, NULL, 0);
+    dyn_array_destroy(array);
+    bool expected = false;
+
+    EXPECT_EQ(ret,expected);
+    if (ret == expected) {
+        score = score + 10;
+    }
+}
+
+
+TEST (load_process_control_blocks, NullParam) {
+	dyn_array_t* pcb = load_process_control_blocks (NULL);
+	ASSERT_EQ((dyn_array_t*)NULL, pcb);
+	score+=5;
+}
+
+TEST (load_process_control_blocks, MissingFileParam) {
+	dyn_array_t* pcb = load_process_control_blocks ("missingfile.bin");
+	ASSERT_EQ((dyn_array_t*)NULL, pcb);
+	score+=5;
+}
+
+
+TEST (load_process_control_blocks, GoodFile) {
+
+    //We will create a temp file to read from because the build isn't situtated where the pcb.bin is and it's contents might change, anyways.
+
+
+    FILE *fd;
+    fd = fopen("test.bin", "wb");
+    uint32_t vals = 4;
+
+	uint32_t test_vals[4] = {
+        15,
+        32547,
+        4251137,
+        0
+    };
+    fwrite(&vals,sizeof(uint32_t),1,fd);
+    fwrite(test_vals,sizeof(uint32_t),4,fd);
+    fclose(fd);
+    dyn_array_t* result = load_process_control_blocks ("test.bin");
+
+    for (uint32_t i=0; i < dyn_array_size(result); i++) {
+        ProcessControlBlock_t* val = (ProcessControlBlock_t*) dyn_array_at(result,i);
+        ASSERT_EQ(val->remaining_burst_time, test_vals[i]);
+        printf("%d\n", test_vals[i]);
+    }
+
+
+    /*
+    fd = fopen("test.bin", "rb");
+	uint32_t N;
+    fread(&N,sizeof(uint32_t),1,fd);
+    uint32_t values[N];
+    fread(values,sizeof(uint32_t),N,fd);
+    */
+
+
+
+
+	score+=5;
+}
+
+
+
 
 int main(int argc, char **argv) 
 {

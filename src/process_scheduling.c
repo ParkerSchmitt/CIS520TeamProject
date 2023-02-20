@@ -47,6 +47,11 @@ bool round_robin(dyn_array_t *ready_queue, ScheduleResult_t *result, size_t quan
     return false;
 }
 
+
+/**
+ * The only thign stored in the .bin file should be the burst times
+ **/
+ 
 dyn_array_t *load_process_control_blocks(const char *input_file) 
 {
     UNUSED(input_file);
