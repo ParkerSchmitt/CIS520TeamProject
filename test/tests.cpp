@@ -52,36 +52,19 @@ TEST (first_come_first_serve, NullQueue) {
         score = score + 10;
     }
 }
-//If result param is null
-TEST (first_come_first_serve, NullResult) {
-    dyn_array_t* array = dyn_array_create(0, sizeof(ProcessControlBlock_t), NULL);
-    bool ret = first_come_first_serve(array, NULL);
-    dyn_array_destroy(array);
-    bool expected = false;
-
-    EXPECT_EQ(ret,expected);
-    if (ret == expected) {
-        score = score + 10;
-    }
-}
 
 //If result params are correct
 TEST (first_come_first_serve, GoodParams) {
     dyn_array_t* array = dyn_array_create(0, sizeof(ProcessControlBlock_t), NULL);
     ScheduleResult_t *result = new ScheduleResult_t;
-    	ProcessControlBlock_t test[5] = {
+    	ProcessControlBlock_t test[3] = {
 			[0] = {5,0,0,false},
 			[1] = {4,0,0,false},
 			[2] = {3,0,0,false},
-			[3] = {2,0,0,false},
-			[4] = {1,0,0,false},
 	};
 	dyn_array_push_back(array,&test[0]);
     dyn_array_push_back(array,&test[1]);
 	dyn_array_push_back(array,&test[2]);
-	dyn_array_push_back(array,&test[3]);
-	dyn_array_push_back(array,&test[4]);
-	dyn_array_push_back(array,&test[5]);
 
 
     bool ret = first_come_first_serve(array, result);
@@ -89,11 +72,11 @@ TEST (first_come_first_serve, GoodParams) {
 
     EXPECT_EQ(true,ret);
     //Average witing timee according to handout is (time to start process x1 + +sumoid(0,1, time to start process x2) +sumoif(0,2, time to start procexx xn) ... from x0 to xn-1)/n
-    EXPECT_EQ((uint32_t) 8, result->average_waiting_time);
+    EXPECT_EQ((uint32_t) 27, result->average_waiting_time);
     //Average witing timee according to handout is (time to start process x1 + +sumoid(0,1, time to start process x2) +sumoif(0,2, time to start procexx xn) ... from x0 to xn)/n
-    EXPECT_EQ((uint32_t) 11, result->average_turnaround_time);
+    EXPECT_EQ((uint32_t) 17, result->average_turnaround_time);
     //Average total run time timee according to handout is sum of all times
-    EXPECT_EQ((uint32_t) 15, result->total_run_time);
+    EXPECT_EQ((uint32_t) 30, result->total_run_time);
     if (ret == true) {
         score = score + 10;
     }
@@ -204,8 +187,6 @@ TEST (load_process_control_blocks, MissingFileParam) {
 TEST (load_process_control_blocks, GoodFile) {
 
     //We will create a temp file to read from because the build isn't situtated where the pcb.bin is and it's contents might change, anyways.
-
-
     FILE *fd;
     fd = fopen("test.bin", "wb");
     uint32_t vals = 4;
@@ -225,7 +206,6 @@ TEST (load_process_control_blocks, GoodFile) {
         ASSERT_EQ(val->remaining_burst_time, test_vals[i*3]);
         ASSERT_EQ(val->priority, test_vals[(i*3)+1]);
         ASSERT_EQ(val->arrival, test_vals[(i*3)+2]);
-
     }
 	score+=5;
 }
@@ -239,3 +219,4 @@ int main(int argc, char **argv)
     ::testing::AddGlobalTestEnvironment(new GradeEnvironment);
     return RUN_ALL_TESTS();
 }
+

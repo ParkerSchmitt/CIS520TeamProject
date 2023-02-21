@@ -20,9 +20,47 @@ void virtual_cpu(ProcessControlBlock_t *process_control_block)
 
 bool first_come_first_serve(dyn_array_t *ready_queue, ScheduleResult_t *result) 
 {
-    UNUSED(ready_queue);
-    UNUSED(result);
-    return false;
+
+    if (ready_queue == NULL) {
+        return false;
+    }
+
+    int total_time = 0;
+    int total_processes = dyn_array_size(ready_queue);
+    int turnaround = 0;
+    int waiting = 0;
+
+    while (dyn_array_size(ready_queue) > 0) {
+
+        int index = 0;
+        uint32_t min = 0;
+        for (size_t i=1; i < dyn_array_size(ready_queue); i++) {
+            if (min > ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->arrival) {
+                index = i;
+                min = ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->arrival;
+            } //new min
+        }
+        ProcessControlBlock_t* p = (ProcessControlBlock_t*) dyn_array_at(ready_queue,index);
+        if (p->remaining_burst_time > 0) {
+            virtual_cpu(p);
+            total_time++;
+        } else {
+            dyn_array_erase(ready_queue, index);
+
+            if (dyn_array_size(ready_queue) > 1) {
+                waiting += total_time;
+            }
+            turnaround += total_time;
+        }
+    }
+
+    result->average_waiting_time = (waiting)/total_processes-1;
+    result->average_turnaround_time = (turnaround)/total_processes;
+    result->total_run_time = total_time;
+
+
+    return true;
+
 }
 
 bool shortest_job_first(dyn_array_t *ready_queue, ScheduleResult_t *result) 

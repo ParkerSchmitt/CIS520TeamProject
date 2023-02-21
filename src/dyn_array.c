@@ -17,7 +17,7 @@ struct dyn_array
 };
 
 // Supports 64bit+ size_t!
-// Semi-arbitrary cap on contents. We'll run out of memory before this happens anyway.
+// Semi-arbitrary capr on contents. We'll run out of memory before this happens anyway.
 // Allowing it to be externally set
 #ifndef DYN_MAX_CAPACITY
 #define DYN_MAX_CAPACITY (((size_t) 1) << ((sizeof(size_t) << 3) - 8))
