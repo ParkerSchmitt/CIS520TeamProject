@@ -210,35 +210,23 @@ TEST (load_process_control_blocks, GoodFile) {
     fd = fopen("test.bin", "wb");
     uint32_t vals = 4;
 
-	uint32_t test_vals[4] = {
-        15,
-        32547,
-        4251137,
-        0
+	uint32_t test_vals[12] = {
+        15,5,3,
+        32547,2,1,
+        4251137,2,1,
+        0,0,0
     };
     fwrite(&vals,sizeof(uint32_t),1,fd);
-    fwrite(test_vals,sizeof(uint32_t),4,fd);
+    fwrite(test_vals,sizeof(uint32_t),12,fd);
     fclose(fd);
     dyn_array_t* result = load_process_control_blocks ("test.bin");
-
-    for (uint32_t i=0; i < dyn_array_size(result); i++) {
+   for (uint32_t i=0; i < dyn_array_size(result); i++) {
         ProcessControlBlock_t* val = (ProcessControlBlock_t*) dyn_array_at(result,i);
-        ASSERT_EQ(val->remaining_burst_time, test_vals[i]);
-        printf("%d\n", test_vals[i]);
+        ASSERT_EQ(val->remaining_burst_time, test_vals[i*3]);
+        ASSERT_EQ(val->priority, test_vals[(i*3)+1]);
+        ASSERT_EQ(val->arrival, test_vals[(i*3)+2]);
+
     }
-
-
-    /*
-    fd = fopen("test.bin", "rb");
-	uint32_t N;
-    fread(&N,sizeof(uint32_t),1,fd);
-    uint32_t values[N];
-    fread(values,sizeof(uint32_t),N,fd);
-    */
-
-
-
-
 	score+=5;
 }
 

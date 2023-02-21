@@ -51,11 +51,36 @@ bool round_robin(dyn_array_t *ready_queue, ScheduleResult_t *result, size_t quan
 /**
  * The only thign stored in the .bin file should be the burst times
  **/
- 
+
 dyn_array_t *load_process_control_blocks(const char *input_file) 
 {
-    UNUSED(input_file);
-    return NULL;
+    if (input_file == NULL || *input_file == 0) {
+        return NULL;
+    }
+
+    FILE *fd = fopen(input_file, "rb");
+    if (fd == NULL)
+    {
+        return NULL;
+    }
+
+	uint32_t N;
+    fread(&N,sizeof(uint32_t),1,fd);
+    uint32_t values[3];
+    ProcessControlBlock_t parsedData[N];
+
+    //0= burst, 1= priority 2= arrival
+    for (size_t i=0; i < (size_t) N; i ++) {
+        fread(values,sizeof(uint32_t),3,fd);
+        parsedData[i].remaining_burst_time = values[0];
+        parsedData[i].priority = values[1];
+        parsedData[i].arrival = values[2];
+    }
+
+
+
+    return dyn_array_import(parsedData, N, sizeof(ProcessControlBlock_t), NULL);
+
 }
 
 bool shortest_remaining_time_first(dyn_array_t *ready_queue, ScheduleResult_t *result) 
