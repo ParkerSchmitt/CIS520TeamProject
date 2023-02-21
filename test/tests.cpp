@@ -58,8 +58,8 @@ TEST (first_come_first_serve, GoodParams) {
     dyn_array_t* array = dyn_array_create(0, sizeof(ProcessControlBlock_t), NULL);
     ScheduleResult_t *result = new ScheduleResult_t;
     	ProcessControlBlock_t test[3] = {
-			[0] = {5,0,0,false},
-			[1] = {4,0,0,false},
+			[0] = {24,0,0,false},
+			[1] = {3,0,0,false},
 			[2] = {3,0,0,false},
 	};
 	dyn_array_push_back(array,&test[0]);
@@ -72,9 +72,9 @@ TEST (first_come_first_serve, GoodParams) {
 
     EXPECT_EQ(true,ret);
     //Average witing timee according to handout is (time to start process x1 + +sumoid(0,1, time to start process x2) +sumoif(0,2, time to start procexx xn) ... from x0 to xn-1)/n
-    EXPECT_EQ((uint32_t) 27, result->average_waiting_time);
+    EXPECT_EQ((uint32_t) 17, result->average_waiting_time);
     //Average witing timee according to handout is (time to start process x1 + +sumoid(0,1, time to start process x2) +sumoif(0,2, time to start procexx xn) ... from x0 to xn)/n
-    EXPECT_EQ((uint32_t) 17, result->average_turnaround_time);
+    EXPECT_EQ((uint32_t) 27, result->average_turnaround_time);
     //Average total run time timee according to handout is sum of all times
     EXPECT_EQ((uint32_t) 30, result->total_run_time);
     if (ret == true) {

@@ -45,16 +45,16 @@ bool first_come_first_serve(dyn_array_t *ready_queue, ScheduleResult_t *result)
             virtual_cpu(p);
             total_time++;
         } else {
-            dyn_array_erase(ready_queue, index);
+            dyn_array_erase(ready_queue,index);
 
-            if (dyn_array_size(ready_queue) > 1) {
+            if (dyn_array_size(ready_queue) > 0) {
                 waiting += total_time;
             }
             turnaround += total_time;
         }
     }
 
-    result->average_waiting_time = (waiting)/total_processes-1;
+    result->average_waiting_time = (waiting)/(total_processes);
     result->average_turnaround_time = (turnaround)/total_processes;
     result->total_run_time = total_time;
 
