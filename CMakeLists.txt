@@ -29,7 +29,7 @@ add_library(dyn_array SHARED src/dyn_array.c)
 
 # Compile the analysis executable.
 
-add_executable(analysis ${CMAKE_SOURCE_DIR}/src/analysis.c)
+add_executable(analysis ${CMAKE_SOURCE_DIR}/src/analysis.c ${CMAKE_SOURCE_DIR}/include/processing_scheduling.h ${CMAKE_SOURCE_DIR}/src/process_scheduling.c)
 
 
 # link the dyn_array library we compiled against our analysis executable.
