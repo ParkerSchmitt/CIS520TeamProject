@@ -134,6 +134,112 @@ TEST (shortest_job_first, GoodParams) {
     }
 }
 
+//If both params are null
+TEST (priority, NullParams) {
+    bool ret = priority(NULL, NULL);
+    bool expected = false;
+    EXPECT_EQ(ret,expected);
+    if (ret == expected) {
+        score = score + 10;
+    }
+}
+//If queue param is null
+TEST (priority, NullQueue) {
+    ScheduleResult_t *result = new ScheduleResult_t;
+    bool ret = priority(NULL, result);
+    bool expected = false;
+    EXPECT_EQ(ret,expected);
+    if (ret == expected) {
+        score = score + 10;
+    }
+}
+
+
+//If result params are correct
+TEST (priority, GoodParams) {
+    dyn_array_t* array = dyn_array_create(0, sizeof(ProcessControlBlock_t), NULL);
+    ScheduleResult_t *result = new ScheduleResult_t;
+    	ProcessControlBlock_t test[5] = {
+			[0] = {10,3,0,false},
+			[1] = {1,5,0,false},
+			[2] = {2,2,0,false},
+            [3] = {1,1,0,false},
+            [4] = {5,4,0,false},
+
+	};
+	dyn_array_push_back(array,&test[0]);
+    dyn_array_push_back(array,&test[1]);
+	dyn_array_push_back(array,&test[2]);
+	dyn_array_push_back(array,&test[3]);
+    dyn_array_push_back(array,&test[4]);
+
+    bool ret = priority(array, result);
+    dyn_array_destroy(array);
+
+    EXPECT_EQ(true,ret);
+    //Average witing timee according to handout is (time to start process x1 + +sumoid(0,1, time to start process x2) +sumoif(0,2, time to start procexx xn) ... from x0 to xn-1)/n
+    EXPECT_EQ((float) 8.2, result->average_waiting_time);
+    //Average witing timee according to handout is (time to start process x1 + +sumoid(0,1, time to start process x2) +sumoif(0,2, time to start procexx xn) ... from x0 to xn)/n
+    EXPECT_EQ((uint32_t) 12, result->average_turnaround_time);
+    //Average total run time timee according to handout is sum of all times
+    EXPECT_EQ((uint32_t) 19, result->total_run_time);
+    if (ret == true) {
+        score = score + 10;
+    }
+}
+
+//If both params are null
+TEST (shortest_remaining_time_first, NullParams) {
+    bool ret = shortest_remaining_time_first(NULL, NULL);
+    bool expected = false;
+    EXPECT_EQ(ret,expected);
+    if (ret == expected) {
+        score = score + 10;
+    }
+}
+//If queue param is null
+TEST (shortest_remaining_time_first, NullQueue) {
+    ScheduleResult_t *result = new ScheduleResult_t;
+    bool ret = shortest_remaining_time_first(NULL, result);
+    bool expected = false;
+    EXPECT_EQ(ret,expected);
+    if (ret == expected) {
+        score = score + 10;
+    }
+}
+
+//If result params are correct
+TEST (shortest_remaining_time_first, GoodParams) {
+    dyn_array_t* array = dyn_array_create(0, sizeof(ProcessControlBlock_t), NULL);
+    ScheduleResult_t *result = new ScheduleResult_t;
+    	ProcessControlBlock_t test[4] = {
+			[0] = {6,0,0,false},
+			[1] = {8,0,0,false},
+			[2] = {7,0,0,false},
+            [3] = {3,0,0,false},
+	};
+	dyn_array_push_back(array,&test[0]);
+    dyn_array_push_back(array,&test[1]);
+	dyn_array_push_back(array,&test[2]);
+	dyn_array_push_back(array,&test[3]);
+
+
+    bool ret = shortest_remaining_time_first(array, result);
+    dyn_array_destroy(array);
+
+    EXPECT_EQ(true,ret);
+    //Average witing timee according to handout is (time to start process x1 + +sumoid(0,1, time to start process x2) +sumoif(0,2, time to start procexx xn) ... from x0 to xn-1)/n
+    EXPECT_EQ((uint32_t) 7, result->average_waiting_time);
+    //Average witing timee according to handout is (time to start process x1 + +sumoid(0,1, time to start process x2) +sumoif(0,2, time to start procexx xn) ... from x0 to xn)/n
+    EXPECT_EQ((uint32_t) 13, result->average_turnaround_time);
+    //Average total run time timee according to handout is sum of all times
+    EXPECT_EQ((uint32_t) 24, result->total_run_time);
+    if (ret == true) {
+        score = score + 10;
+    }
+}
+
+
 //If queue param is null
 TEST (round_robin, NullQueue) {
     ScheduleResult_t *result = new ScheduleResult_t;

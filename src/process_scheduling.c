@@ -73,22 +73,33 @@ bool shortest_job_first(dyn_array_t *ready_queue, ScheduleResult_t *result)
     int waiting = 0;
     while (dyn_array_size(ready_queue) > 0) {
 
-        int index = 0;
+        size_t index = 0;
         uint32_t min = 0xFFFFFFFF;
         
         for (size_t i=0; i < dyn_array_size(ready_queue); i++) {
-            if (min > ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->remaining_burst_time) {
-                index = i;
-                min = ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->remaining_burst_time;
+            if (min >= ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->remaining_burst_time) {
+
+                //Two things same value different things, we do FCFS 
+                if (index != i && ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->remaining_burst_time == min) {
+                    //If the old indexes arrival is greater, we take the new one
+                    if ( ((ProcessControlBlock_t*) dyn_array_at(ready_queue,index))->arrival > ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->arrival) {
+                        index = i;
+                        min = ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->remaining_burst_time;
+                    }
+                } 
+                // Its less than and a new value
+                else {
+                    index = i;
+                    min = ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->remaining_burst_time;
+                }
 
             } //new min
         }
         ProcessControlBlock_t* p = (ProcessControlBlock_t*) dyn_array_at(ready_queue,index);
-        if (p->remaining_burst_time > 0) {
+        while (p->remaining_burst_time > 0) {
             virtual_cpu(p);
-            
             total_time++;
-        } else {
+        } 
 
             dyn_array_erase(ready_queue,index);
 
@@ -98,7 +109,7 @@ bool shortest_job_first(dyn_array_t *ready_queue, ScheduleResult_t *result)
             }
             turnaround += total_time;
 
-        }
+        
     }
 
     result->average_waiting_time =  (waiting)/(total_processes);
@@ -111,9 +122,48 @@ bool shortest_job_first(dyn_array_t *ready_queue, ScheduleResult_t *result)
 
 bool priority(dyn_array_t *ready_queue, ScheduleResult_t *result) 
 {
-    UNUSED(ready_queue);
-    UNUSED(result);
-    return false;   
+    if (ready_queue == NULL) {
+        return false;
+    }
+    int total_time = 0;
+    int total_processes = dyn_array_size(ready_queue);
+    int turnaround = 0;
+    int waiting = 0;
+    while (dyn_array_size(ready_queue) > 0) {
+
+        int index = 0;
+        uint32_t max = 0;
+        
+        for (size_t i=0; i < dyn_array_size(ready_queue); i++) {
+            if (max < ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->priority) {
+                index = i;
+                max = ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->priority;
+
+            } //new max
+        }
+        ProcessControlBlock_t* p = (ProcessControlBlock_t*) dyn_array_at(ready_queue,index);
+        if (p->remaining_burst_time > 0) {
+            virtual_cpu(p);
+            
+            total_time++;
+        } else {
+
+            dyn_array_erase(ready_queue,index);
+
+           if (dyn_array_size(ready_queue) > 0) {
+                waiting += total_time;
+            }
+            turnaround += total_time;
+
+        }
+    }
+
+    result->average_waiting_time =  ((float) waiting)/((float) total_processes);
+    result->average_turnaround_time = (turnaround)/total_processes;
+    result->total_run_time = total_time;
+
+
+    return true;
 }
 
 bool round_robin(dyn_array_t *ready_queue, ScheduleResult_t *result, size_t quantum) 
@@ -162,7 +212,60 @@ dyn_array_t *load_process_control_blocks(const char *input_file)
 
 bool shortest_remaining_time_first(dyn_array_t *ready_queue, ScheduleResult_t *result) 
 {
-    UNUSED(ready_queue);
-    UNUSED(result);
-    return false;
+if (ready_queue == NULL) {
+        return false;
+    }
+    int total_time = 0;
+    int total_processes = dyn_array_size(ready_queue);
+    int turnaround = 0;
+    int waiting = 0;
+    while (dyn_array_size(ready_queue) > 0) {
+
+        size_t index = 0;
+        uint32_t min = 0xFFFFFFFF;
+        
+        for (size_t i=0; i < dyn_array_size(ready_queue); i++) {
+            if (min > ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->remaining_burst_time) {
+
+              //Two things same value different things, we do FCFS 
+                if (index != i && ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->remaining_burst_time == min) {
+                    //If the old indexes arrival is greater, we take the new one
+                    if ( ((ProcessControlBlock_t*) dyn_array_at(ready_queue,index))->arrival > ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->arrival) {
+                        index = i;
+                        min = ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->remaining_burst_time;
+                    }
+                } 
+                // Its less than and a new value
+                else {
+                    index = i;
+                    min = ((ProcessControlBlock_t*) dyn_array_at(ready_queue,i))->remaining_burst_time;
+                }
+
+
+            } //new min
+        }
+        ProcessControlBlock_t* p = (ProcessControlBlock_t*) dyn_array_at(ready_queue,index);
+        if (p->remaining_burst_time > 0) {
+            virtual_cpu(p);
+            
+            total_time++;
+        } else {
+
+            dyn_array_erase(ready_queue,index);
+
+           if (dyn_array_size(ready_queue) > 0) {
+                printf("it has had to wait: %d\n", total_time);
+                waiting += total_time;
+            }
+            turnaround += total_time;
+
+        }
+    }
+
+    result->average_waiting_time =  (waiting)/(total_processes);
+    result->average_turnaround_time = (turnaround)/total_processes;
+    result->total_run_time = total_time;
+
+
+    return true;
 }
