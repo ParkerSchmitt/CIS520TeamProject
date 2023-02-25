@@ -39,12 +39,21 @@ bool priority(dyn_array_t *ready_queue, ScheduleResult_t *result)
     return false;   
 }
 
+int compare(const void * a, const void * b)
+{
+    return ( *(int*)a - *(int*)b );
+}
+
 bool round_robin(dyn_array_t *ready_queue, ScheduleResult_t *result, size_t quantum) 
 {
     if (!ready_queue || !result || quantum == 0) return false;
 
     // the number of pcbs in ready_queue
     size_t n = dyn_array_size(ready_queue);
+
+    // sort ready_queue by arrival time
+    dyn_array_sort(ready_queue,compare);
+
     // waiting time, burst time, turnaround time
     int wt[n], bt[n], tat[n];
 
@@ -54,6 +63,7 @@ bool round_robin(dyn_array_t *ready_queue, ScheduleResult_t *result, size_t quan
     }
 
     uint32_t total_time = 0;
+    bool first_loop = true;
 
     while (1)
     {
@@ -63,11 +73,10 @@ bool round_robin(dyn_array_t *ready_queue, ScheduleResult_t *result, size_t quan
         for (size_t i = 0; i < n; i++)
         {
             ProcessControlBlock_t* pcb = (ProcessControlBlock_t*) dyn_array_at(ready_queue,i);
-
             if (pcb->remaining_burst_time > 0)
             {
                 done = false;
-
+                if(first_loop) pcb->started = true;
                 if(pcb->remaining_burst_time > quantum)
                 {
                     total_time += quantum;
@@ -81,7 +90,7 @@ bool round_robin(dyn_array_t *ready_queue, ScheduleResult_t *result, size_t quan
                 }
             }
         }
-
+        first_loop = false;
         if (done) break;
     }
 
@@ -94,7 +103,7 @@ bool round_robin(dyn_array_t *ready_queue, ScheduleResult_t *result, size_t quan
         total_tat = total_tat + tat[i];
     }
 
-    result->average_waiting_time = (float)total_wt / (float)n;
+    result->average_waiting_time = ceilf(((float)total_wt / (float)n) * 1000) / 1000;
     result->average_turnaround_time = ceilf(((float)total_tat / (float)n) * 1000) / 1000;
     result->total_run_time = total_time;
 
