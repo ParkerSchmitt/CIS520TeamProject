@@ -263,7 +263,6 @@ TEST (round_robin, NullResult) {
     }
 }
 
-
 TEST (load_process_control_blocks, NullParam) {
 	dyn_array_t* pcb = load_process_control_blocks (NULL);
 	ASSERT_EQ((dyn_array_t*)NULL, pcb);
